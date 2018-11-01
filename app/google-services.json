@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "544384500988",
+    "firebase_url": "https://rastreo-aab45.firebaseio.com",
+    "project_id": "rastreo-aab45",
+    "storage_bucket": "rastreo-aab45.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:544384500988:android:77ef93e23b6cc5f0",
+        "android_client_info": {
+          "package_name": "tralafarlaw.miguel.find"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "544384500988-ifcue9ihofs6nokemadg38b1cacd34g5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tralafarlaw.miguel.find",
+            "certificate_hash": "849b92dbe7dcd2edb5356e3cdbf87f5bf2439421"
+          }
+        },
+        {
+          "client_id": "544384500988-hkrl19oq7d72todbuhq2b2dp5snn09ah.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbmh23QNHMDIzIuuk1QltTxRvi5tLkDwY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "544384500988-hkrl19oq7d72todbuhq2b2dp5snn09ah.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
