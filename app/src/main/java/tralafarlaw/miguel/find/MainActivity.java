@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -25,7 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
     // firebase auth
     FirebaseAuth mAuth;
 
@@ -36,38 +38,77 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public static final int RC_SIGN_IN = 9001;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mapiclient.connect();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-        
         setContentView(R.layout.activity_main);
         inicio_de_sesion();
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(mapiclient.isConnected()){
+            loginUser();
+        }
+    }
+
     public void inicio_de_sesion(){
-        //creamos el menu para seleccionar el correo que jalara del celular
+        mAuth = FirebaseAuth.getInstance();
+        // Configura Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         mapiclient = new GoogleApiClient.Builder(getApplicationContext())
                 .enableAutoManage(this, this)
-               // .addConnectionCallbacks(this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
-                .addApi(LocationServices.API)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        SignInButton Login_Button = findViewById(R.id.btnSignIn);
-        Login_Button.setOnClickListener(this);
-        mAuth = FirebaseAuth.getInstance();
+        SignInButton login = findViewById(R.id.btnSignIn);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginUser();
+
+            }
+        });
+    }
+    public void loginUser (){
+        Intent intent = Auth.GoogleSignInApi.getSignInIntent(mapiclient);
+        startActivityForResult(intent, RC_SIGN_IN);
+        Toast.makeText(getApplicationContext(), "login inicia", Toast.LENGTH_SHORT);
 
     }
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Toast.makeText(getApplicationContext(), "onactvresult", Toast.LENGTH_LONG);
+        if(requestCode == RC_SIGN_IN){
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+
+            ManejarELResultadoDelLogin(result);
+
+
+        }
+    }
+    public void ManejarELResultadoDelLogin (GoogleSignInResult result){
+        Log.d(TAG, "manejar el resultado: "+result.isSuccess());
+        if (result.isSuccess()){
+
+            GoogleSignInAccount account = result.getSignInAccount();
+            Toast.makeText(getApplicationContext(), "Bienvenido: "+account.getDisplayName(), Toast.LENGTH_SHORT);
+            firebaseAuthWithGoogle(account);
+
+        }else {
+            Toast.makeText(getApplicationContext(), "error", Toast.LENGTH_LONG);
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d(TAG,"Error de Coneccion");
+    }
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
@@ -77,46 +118,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "login exitoso");
+                            Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            //updateUI(user);
+
+                            Intent it = new Intent(getApplicationContext(), mapaosm.class);
+
+
+                            it.putExtra("Nombre", acct.getDisplayName());
+
+                            startActivity(it);
                         } else {
                             // If sign in fails, display a message to the user.
-                            Log.w(TAG, "error de login", task.getException());
-                           // Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-                            //updateUI(null);
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+
                         }
 
                         // ...
                     }
                 });
     }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
-    @Override
-    public void onClick(View v) {
-        Intent it = Auth.GoogleSignInApi.getSignInIntent(mapiclient);
-        startActivity(it);
-
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        GoogleSignInResult result  = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-        TrabajarConElLogin(result);
-    }
-    public void TrabajarConElLogin (GoogleSignInResult result){
-        if(result.isSuccess()){
-            GoogleSignInAccount acc = result.getSignInAccount();
-            //trabajar con la cuenta acc que es el usuario
-            firebaseAuthWithGoogle(acc);
-        }
-    }
-
 }
