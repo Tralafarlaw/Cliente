@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if(result.isSuccess()){
             GoogleSignInAccount acc = result.getSignInAccount();
             //trabajar con la cuenta acc que es el usuario
+
         }
     }
 
