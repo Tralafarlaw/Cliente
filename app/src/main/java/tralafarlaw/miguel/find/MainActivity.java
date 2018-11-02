@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        SignInButton login = findViewById(R.id.btnSignIn);
+        SignInButton login = (SignInButton) findViewById(R.id.btnSignIn);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
