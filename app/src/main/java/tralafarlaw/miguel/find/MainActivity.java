@@ -29,12 +29,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener{
+public class MainActivity extends AppCompatActivity{
     // firebase auth
     FirebaseAuth mAuth;
 
     //Cliente del API de firebase
     GoogleApiClient mapiclient;
+
+    SignInButton login;
 
     public static final String TAG = "SignInActivity";
     public static final int RC_SIGN_IN = 9001;
@@ -43,9 +45,46 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        inicio_de_sesion();
+        //inicio_de_sesion();
+
+        login = (SignInButton) findViewById(R.id.btnSignIn);
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(
+                        AuthUI.getInstance().createSignInIntentBuilder().build(), RC_SIGN_IN
+                );
+            }
+        });
+
+
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == RC_SIGN_IN)
+        {
+            startNewActivity(resultCode,data);
+        }
+    }
+
+    private void startNewActivity(int resultCode, Intent data) {
+        if(resultCode == RESULT_OK)
+        {
+            Intent intent = new Intent(MainActivity.this,mapaosm.class);
+            startActivity(intent);
+            finish();
+        }
+        else
+        {
+            Toast.makeText(this, "Login failed !!!", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+
+    /*
     @Override
     protected void onStart() {
         super.onStart();
@@ -53,7 +92,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             loginUser();
         }
     }
-
+    */
+    /*
     public void inicio_de_sesion(){
         mAuth = FirebaseAuth.getInstance();
 
@@ -68,15 +108,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        SignInButton login = (SignInButton) findViewById(R.id.btnSignIn);
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(
-                        AuthUI.getInstance().createSignInIntentBuilder().setAllowNewEmailAccounts(true).build(),RC_SIGN_IN
-                );
 
-            }
         });
     }
     public void loginUser (){
@@ -144,4 +176,5 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     }
                 });
     }
+    */
 }
