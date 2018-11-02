@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -71,7 +72,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginUser();
+                startActivityForResult(
+                        AuthUI.getInstance().createSignInIntentBuilder().setAllowNewEmailAccounts(true).build(),RC_SIGN_IN
+                );
 
             }
         });
@@ -110,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d(TAG,"Error de Coneccion");
+        Log.d(TAG,"Error de ConeXion");
     }
     private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
