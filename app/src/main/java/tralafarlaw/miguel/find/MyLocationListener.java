@@ -4,8 +4,14 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class MyLocationListener implements LocationListener {
     private mapaosm mainActivity;
+    private DatabaseReference databaseReference;
 
     public mapaosm getMainActivity() {
         return mainActivity;
@@ -25,6 +31,17 @@ public class MyLocationListener implements LocationListener {
                 + loc.getLatitude() + "\n Long = " + loc.getLongitude();
         //messageTextView.setText(Text);
         this.mainActivity.setLocation(loc);
+
+        //empezamos con firebase
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
+        User user1 = new User(fbuser.getDisplayName(),loc.getLongitude(),loc.getLatitude());
+        updatedb(user1);
+
+    }
+
+    public void updatedb (User usr){
+        databaseReference.child("locations").child(usr.getEmail()).setValue(usr);
     }
 
     @Override
