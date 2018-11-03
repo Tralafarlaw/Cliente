@@ -41,7 +41,7 @@ public class MyLocationListener implements LocationListener {
     }
 
     public void updatedb (User usr){
-        databaseReference.child("locations").child(usr.getEmail()).setValue(usr);
+        databaseReference.child(usr.getEmail()).setValue(usr);
     }
 
     @Override
