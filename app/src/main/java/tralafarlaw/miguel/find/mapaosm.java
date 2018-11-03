@@ -13,6 +13,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -26,6 +31,10 @@ public class mapaosm extends AppCompatActivity {
     Context ctx;
     IMapController mapDriver;
     Location yo;
+
+    //database firbase
+    private DatabaseReference databaseReference;
+
     public void setLocation(Location loc){
         this.yo = loc;
     }
@@ -38,7 +47,20 @@ public class mapaosm extends AppCompatActivity {
         setContentView(R.layout.activity_mapaosm);
         TextView tv =(TextView) findViewById(R.id.Nombre);
 //        tv.setText(getIntent().getExtras().getString("Nombre"));
+        init_mapa();
+        //empezamos con firebase
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
+        User user1 = new User(fbuser.getEmail(),yo.getLongitude(),yo.getLatitude());
 
+
+
+
+
+
+
+    }
+    public void init_mapa(){
         map = (MapView) findViewById(R.id.mapaOSM);
         map.setTileSource(TileSourceFactory.MAPNIK);
 
@@ -67,14 +89,9 @@ public class mapaosm extends AppCompatActivity {
 
         GeoPoint starPoint = new GeoPoint(yo.getLatitude(),yo.getLongitude());
 
-
-
-
         mapDriver.setCenter(starPoint);
-        mapDriver.setZoom(9.0);
-
+        mapDriver.setZoom(15.0);
     }
-
 
     @Override
     protected void onPause() {
