@@ -61,7 +61,7 @@ public class mapaosm extends AppCompatActivity {
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
-        User user1 = new User(fbuser.getEmail(),yo.getLongitude(),yo.getLatitude(),true);
+        User user1 = new User(fbuser.getEmail(),yo.getLongitude(),yo.getLatitude(),true,"pnaranja");
 
 
 

@@ -35,7 +35,7 @@ public class MyLocationListener implements LocationListener {
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
-        User user1 = new User(fbuser.getDisplayName(),loc.getLongitude(),loc.getLatitude(),true);
+        User user1 = new User(fbuser.getDisplayName(),loc.getLongitude(),loc.getLatitude(),true,"pnaranja");
         updatedb(user1);
 
     }

@@ -5,19 +5,30 @@ public class User {
     private double lat;
     private double lon;
     private boolean visible;
+    private String color;
 
     public User() {
         email = null;
         setLat(0.0);
         setLon(0.0);
         visible = true;
+        color = null;
     }
 
-    public User(String email, double longitude, double latitude, boolean visible){
+    public User(String email, double longitude, double latitude, boolean visible, String color){
         this.email = email;
         this.lat = latitude;
         this.lon = longitude;
         this.visible = visible;
+        this.color = color;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public boolean isVisible() {
