@@ -7,6 +7,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -22,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -31,8 +33,12 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.OverlayManager;
+import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class mapaosm extends AppCompatActivity {
 
@@ -139,23 +145,33 @@ public class mapaosm extends AppCompatActivity {
                 for (DataSnapshot data: dataSnapshot.getChildren()){
                     User user = data.getValue(User.class);
                     Marker mk  = new Marker(map);
-                    mk.setIcon(getResources().getDrawable(R.drawable.pnaranja));
+                    mk.setIcon(getResources().getDrawable(R.drawable.pppnaranja));
                     mk.setTitle(user.getEmail());
                     mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                     mk.setPosition(new GeoPoint(user.getLat(),user.getLon()));
                     mk.setVisible(user.isVisible());
+
                     boolean sw = false;
                     for (Overlay o : map.getOverlays()){
                         Marker aux = (Marker) o ;
                         if(aux.getTitle().equals(mk.getTitle())){
+                            Polyline line = new Polyline();
+                            List<GeoPoint> v = new ArrayList<>();
+                            v.add(aux.getPosition());
+                            v.add(mk.getPosition());
+                            line.setPoints(v);
+
+
+                           // animar(aux, mk);
                             aux.setPosition(mk.getPosition());
                             sw = true;
                         }
                     }
                     if(!sw){
+
                         map.getOverlays().add(mk);
                     }
-
+                    map.getController().animateTo((IGeoPoint) mk.getPosition(), 20.4, 5);
                   //  anotherOverlayItemArray.add(new OverlayItem(user.getEmail(),"",new GeoPoint(user.getLat(),user.getLon())));
                 }
         //        ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<>(getApplicationContext(),anotherOverlayItemArray, gestlis);
@@ -168,6 +184,26 @@ public class mapaosm extends AppCompatActivity {
             }
         });
     }
+     public void animar (Marker a, Marker b){
+
+        double lat, lon, dist, tan;
+        lat = b.getPosition().getLatitude();
+        lon = b.getPosition().getLongitude();
+
+        tan = lon/lat;
+        dist = Math.sqrt((lat*lat)+(lon*lon));
+
+        long delay = 10;
+         final Handler handler = new Handler();
+         handler.postDelayed(new Runnable() {
+             @Override
+             public void run() {
+
+                 // HAcer aui la animacion
+             }
+         }, delay);
+
+     }
 
     @Override
     protected void onPause() {
