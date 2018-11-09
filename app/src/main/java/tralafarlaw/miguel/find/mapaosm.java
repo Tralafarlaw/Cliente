@@ -29,6 +29,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
@@ -138,12 +139,23 @@ public class mapaosm extends AppCompatActivity {
                 for (DataSnapshot data: dataSnapshot.getChildren()){
                     User user = data.getValue(User.class);
                     Marker mk  = new Marker(map);
-                    mk.setIcon(getResources().getDrawable(R.drawable.amarillo));
+                    mk.setIcon(getResources().getDrawable(R.drawable.pnaranja));
                     mk.setTitle(user.getEmail());
                     mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                     mk.setPosition(new GeoPoint(user.getLat(),user.getLon()));
                     mk.setVisible(user.isVisible());
-                    map.getOverlays().add(mk);
+                    boolean sw = false;
+                    for (Overlay o : map.getOverlays()){
+                        Marker aux = (Marker) o ;
+                        if(aux.getTitle().equals(mk.getTitle())){
+                            aux.setPosition(mk.getPosition());
+                            sw = true;
+                        }
+                    }
+                    if(!sw){
+                        map.getOverlays().add(mk);
+                    }
+
                   //  anotherOverlayItemArray.add(new OverlayItem(user.getEmail(),"",new GeoPoint(user.getLat(),user.getLon())));
                 }
         //        ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<>(getApplicationContext(),anotherOverlayItemArray, gestlis);
