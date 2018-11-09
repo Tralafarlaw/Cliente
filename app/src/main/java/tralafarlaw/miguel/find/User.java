@@ -4,20 +4,29 @@ public class User {
     private String email;
     private double lat;
     private double lon;
+    private boolean visible;
 
     public User() {
         email = null;
         setLat(0.0);
         setLon(0.0);
+        visible = true;
     }
 
-    public User(String email, double longitude, double latitude){
+    public User(String email, double longitude, double latitude, boolean visible){
         this.email = email;
         this.lat = latitude;
         this.lon = longitude;
+        this.visible = visible;
     }
 
+    public boolean isVisible() {
+        return visible;
+    }
 
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 
     public User(String email) {
         this.email = email;
