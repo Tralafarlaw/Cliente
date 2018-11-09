@@ -138,7 +138,7 @@ public class mapaosm extends AppCompatActivity {
                 for (DataSnapshot data: dataSnapshot.getChildren()){
                     User user = data.getValue(User.class);
                     Marker mk  = new Marker(map);
-                    mk.setIcon(getDrawable(R.drawable.amarillo));
+                    mk.setIcon(getResources().getDrawable(R.drawable.amarillo));
                     mk.setTitle(user.getEmail());
                     mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                     mk.setPosition(new GeoPoint(user.getLat(),user.getLon()));
