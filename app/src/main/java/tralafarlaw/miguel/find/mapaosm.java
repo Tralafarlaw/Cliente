@@ -28,7 +28,6 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
-import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ public class mapaosm extends AppCompatActivity {
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
-        User user1 = new User(fbuser.getEmail(),yo.getLongitude(),yo.getLatitude(),true);
+        User user1 = new User(fbuser.getEmail(),yo.getLongitude(),yo.getLatitude());
 
 
 
@@ -137,16 +136,10 @@ public class mapaosm extends AppCompatActivity {
                 };
                 for (DataSnapshot data: dataSnapshot.getChildren()){
                     User user = data.getValue(User.class);
-                    Marker mk = new Marker(map);
-                    mk.setPosition(new GeoPoint(user.getLat(),user.getLon()));
-                    mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                    mk.setTitle(user.getEmail());
-                    mk.setIcon(getDrawable(R.drawable.amarillo));
-                    map.getOverlays().add(mk);
-               //     anotherOverlayItemArray.add(new OverlayItem(user.getEmail(),"",new GeoPoint(user.getLat(),user.getLon())));
+                    anotherOverlayItemArray.add(new OverlayItem(user.getEmail(),"",new GeoPoint(user.getLat(),user.getLon())));
                 }
-             //   ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<>(getApplicationContext(),anotherOverlayItemArray, gestlis);
-              //  map.getOverlays().add(overlay);
+                ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<>(getApplicationContext(),anotherOverlayItemArray, gestlis);
+                map.getOverlays().add(overlay);
             }
 
             @Override
