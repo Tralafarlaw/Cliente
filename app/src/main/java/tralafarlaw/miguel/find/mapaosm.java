@@ -28,6 +28,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
@@ -126,7 +127,7 @@ public class mapaosm extends AppCompatActivity {
                     public boolean onItemSingleTapUp(int index, OverlayItem item) {
                         Toast.makeText(
                                 getApplicationContext(),
-                                item.getSnippet() + "n" + item.getTitle() + "n"
+                                item.getSnippet() + "\n" + item.getTitle() + "\n"
                                         + item.getPoint().getLatitude() + " : "
                                         + item.getPoint().getLongitude(),
                                 Toast.LENGTH_LONG).show();
@@ -136,10 +137,17 @@ public class mapaosm extends AppCompatActivity {
                 };
                 for (DataSnapshot data: dataSnapshot.getChildren()){
                     User user = data.getValue(User.class);
-                    anotherOverlayItemArray.add(new OverlayItem(user.getEmail(),"",new GeoPoint(user.getLat(),user.getLon())));
+                    Marker mk  = new Marker(map);
+                    mk.setIcon(getDrawable(R.drawable.amarillo));
+                    mk.setTitle(user.getEmail());
+                    mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    mk.setPosition(new GeoPoint(user.getLat(),user.getLon()));
+                    mk.setVisible(user.isVisible());
+                    map.getOverlays().add(mk);
+                  //  anotherOverlayItemArray.add(new OverlayItem(user.getEmail(),"",new GeoPoint(user.getLat(),user.getLon())));
                 }
-                ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<>(getApplicationContext(),anotherOverlayItemArray, gestlis);
-                map.getOverlays().add(overlay);
+        //        ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<>(getApplicationContext(),anotherOverlayItemArray, gestlis);
+      //          map.getOverlays().add(overlay);
             }
 
             @Override
