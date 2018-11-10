@@ -1,6 +1,7 @@
 package tralafarlaw.miguel.find;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,7 +103,7 @@ public class mapaosm extends AppCompatActivity {
         yo = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
 
-        Toast.makeText(getApplicationContext(),""+String.valueOf(yo.getLatitude())+" "+String.valueOf(yo.getLongitude()), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(),""+String.valueOf(yo.getLatitude())+" \n"+String.valueOf(yo.getLongitude()), Toast.LENGTH_SHORT).show();
 
         GeoPoint starPoint = new GeoPoint(yo.getLatitude(),yo.getLongitude());
 
@@ -150,6 +152,7 @@ public class mapaosm extends AppCompatActivity {
                     mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                     mk.setPosition(new GeoPoint(user.getLat(),user.getLon()));
                     mk.setVisible(user.isVisible());
+                    map.postInvalidate();
 
                     boolean sw = false;
                     for (Overlay o : map.getOverlays()){
@@ -162,8 +165,13 @@ public class mapaosm extends AppCompatActivity {
                             line.setPoints(v);
 
 
-                           // animar(aux, mk);
-                            aux.setPosition(mk.getPosition());
+                            try {
+                                animar(aux, mk);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+
+
                             sw = true;
                         }
                     }
@@ -171,7 +179,7 @@ public class mapaosm extends AppCompatActivity {
 
                         map.getOverlays().add(mk);
                     }
-                    map.getController().animateTo((IGeoPoint) mk.getPosition(), 20.4, 5);
+                    //map.getController().animateTo((IGeoPoint) mk.getPosition(), 20.4, 5);
                   //  anotherOverlayItemArray.add(new OverlayItem(user.getEmail(),"",new GeoPoint(user.getLat(),user.getLon())));
                 }
         //        ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<>(getApplicationContext(),anotherOverlayItemArray, gestlis);
@@ -184,25 +192,41 @@ public class mapaosm extends AppCompatActivity {
             }
         });
     }
-     public void animar (Marker a, Marker b){
+     public void animar (final Marker a, Marker b) throws InterruptedException {
+        final double latf = b.getPosition().getLatitude();
+        final double lonf = b.getPosition().getLongitude();
 
-        double lat, lon, dist, tan;
-        lat = b.getPosition().getLatitude();
-        lon = b.getPosition().getLongitude();
 
-        tan = lon/lat;
-        dist = Math.sqrt((lat*lat)+(lon*lon));
+         if(a.getPosition().equals(b.getPosition())){
+             return;
+         }
+        final double distLat , distLon , constLat, constLon ;
 
+        distLat = Math.abs(a.getPosition().getLatitude()-b.getPosition().getLatitude());
+        distLon = Math.abs(a.getPosition().getLongitude()-b.getPosition().getLongitude());
+
+        constLat = distLat/1000;
+        constLon = distLon/1000;
+        if(a.getTitle().equals("test")){
+        Toast.makeText(getApplicationContext(),constLat+" "+constLon,Toast.LENGTH_SHORT).show();}
         long delay = 10;
-         final Handler handler = new Handler();
-         handler.postDelayed(new Runnable() {
-             @Override
-             public void run() {
+        final GeoPoint point = a.getPosition();
+         for (int i = 0; i < 1000; i++) {
+             //Thread.sleep(delay);
+             double e=point.getLatitude()+constLat;
+             double r=point.getLongitude()+constLon;
+             point.setLatitude(e);
+             point.setLongitude(r);
+             a.setPosition(new GeoPoint(e,r));
 
-                 // HAcer aui la animacion
+
+             //a.setPosition(b.getPosition());
+            // Toast.makeText(getApplicationContext(),"index: "+ i+" \nconstlat = "+constLat+"\ndistlat = "+distLat+"\ne = "+point.getLatitude()+constLat+"\nb = "+point.getLongitude()+constLon,Toast.LENGTH_SHORT).show();
+             if(a.getPosition().equals(b.getPosition())){
+                 return;
              }
-         }, delay);
-
+         }
+         a.setPosition(new GeoPoint(latf, lonf));
      }
 
     @Override
