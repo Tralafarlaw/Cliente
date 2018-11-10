@@ -63,8 +63,8 @@ public class mapaosm extends AppCompatActivity {
         ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         setContentView(R.layout.activity_mapaosm);
-        TextView tv =(TextView) findViewById(R.id.Nombre);
-        tv.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+       /// TextView tv =(TextView) findViewById(R.id.Nombre);
+       // tv.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
         init_mapa();
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -121,8 +121,6 @@ public class mapaosm extends AppCompatActivity {
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ArrayList<OverlayItem> anotherOverlayItemArray;
-                anotherOverlayItemArray = new ArrayList<OverlayItem>();
 
                 ItemizedIconOverlay.OnItemGestureListener<OverlayItem> gestlis = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
 
@@ -156,21 +154,72 @@ public class mapaosm extends AppCompatActivity {
 
                     boolean sw = false;
                     for (Overlay o : map.getOverlays()){
-                        Marker aux = (Marker) o ;
+                        final Marker aux = (Marker) o ;
                         if(aux.getTitle().equals(mk.getTitle())){
                             Polyline line = new Polyline();
                             List<GeoPoint> v = new ArrayList<>();
                             v.add(aux.getPosition());
                             v.add(mk.getPosition());
                             line.setPoints(v);
+                            aux.setPosition(mk.getPosition());
 
-
-                            try {
-                                animar(aux, mk);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                            /*inicio de la animacion
+                            final double latf = mk.getPosition().getLatitude();
+                            final double lonf = mk.getPosition().getLongitude();
+                            final double lats = aux.getPosition().getLatitude();
+                            final double lons = aux.getPosition().getLongitude();
+                            final boolean up, left;
+                            if(lats > latf){
+                                up = false;
+                            }else{
+                                up=false;
                             }
+                            if(lons > lonf){
+                                left = true;
+                            }else{
+                                left = false;
+                            }
+                            final double distLat , distLon , constLat, constLon ;
 
+                            distLat = Math.abs(lats-latf);
+                            distLon = Math.abs(lons-lonf);
+
+                            constLat = distLat/100;
+                            constLon = distLon/100;
+                            if(aux.getTitle().equals("test")){
+                                Toast.makeText(getApplicationContext(),constLat+" "+constLon,Toast.LENGTH_SHORT).show();}
+                            long delay = 1000;
+                            final GeoPoint point = aux.getPosition();
+                            for (int i = 0; i < 100; i++) {
+                                //Thread.sleep(delay);
+                                final Handler handler = new Handler();
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Do something after 5s = 5000ms
+                                        double e = point.getLatitude(),r = point.getLongitude();
+                                        if(!up){
+                                            e -= constLat;
+                                        }else {
+                                            e += constLat;
+                                        }
+                                        if(left){
+                                            r -= constLon;
+                                        }else {
+                                            r += constLon;
+                                        }
+                                        point.setLatitude(e);
+                                        point.setLongitude(r);
+                                        aux.setPosition(point);
+                                    }
+                                }, delay);
+                                //a.setPosition(b.getPosition());
+                                // Toast.makeText(getApplicationContext(),"index: "+ i+" \nconstlat = "+constLat+"\ndistlat = "+distLat+"\ne = "+point.getLatitude()+constLat+"\nb = "+point.getLongitude()+constLon,Toast.LENGTH_SHORT).show();
+
+                            }
+                           // aux.setPosition(new GeoPoint(latf, lonf));
+                            //final de la animacion
+*/
 
                             sw = true;
                         }
@@ -193,40 +242,43 @@ public class mapaosm extends AppCompatActivity {
         });
     }
      public void animar (final Marker a, Marker b) throws InterruptedException {
-        final double latf = b.getPosition().getLatitude();
-        final double lonf = b.getPosition().getLongitude();
+         final double latf = b.getPosition().getLatitude();
+         final double lonf = b.getPosition().getLongitude();
 
+         final double distLat, distLon, constLat, constLon;
 
-         if(a.getPosition().equals(b.getPosition())){
+         distLat = (a.getPosition().getLatitude() - b.getPosition().getLatitude());
+         distLon = (a.getPosition().getLongitude() - b.getPosition().getLongitude());
+
+         constLat = distLat * Math.pow(10, -3);
+         constLon = distLon * Math.pow(10, -3);
+         if (a.getTitle().equals("test")) {
+             //Toast.makeText(getApplicationContext(),constLat+" "+constLon,Toast.LENGTH_SHORT).show();}
+             long delay = 10;
+             final GeoPoint point = a.getPosition();
+             for (int i = 0; i < 1000; i++) {
+                 //Thread.sleep(delay);
+                 final Handler handler = new Handler();
+                 handler.postDelayed(new Runnable() {
+                     @Override
+                     public void run() {
+                         // Do something after 5s = 5000ms
+                         double e = point.getLatitude() + constLat;
+                         double r = point.getLongitude() + constLon;
+                         //      point.setLatitude(e);
+                         //       point.setLongitude(r);
+                         a.setPosition(new GeoPoint(e, r));
+                     }
+                 }, delay);
+                 //a.setPosition(b.getPosition());
+                 // Toast.makeText(getApplicationContext(),"index: "+ i+" \nconstlat = "+constLat+"\ndistlat = "+distLat+"\ne = "+point.getLatitude()+constLat+"\nb = "+point.getLongitude()+constLon,Toast.LENGTH_SHORT).show();
+                 if (a.getPosition().equals(b.getPosition())) {
+                     return;
+                 }
+             }
+             a.setPosition(new GeoPoint(latf, lonf));
              return;
          }
-        final double distLat , distLon , constLat, constLon ;
-
-        distLat = Math.abs(a.getPosition().getLatitude()-b.getPosition().getLatitude());
-        distLon = Math.abs(a.getPosition().getLongitude()-b.getPosition().getLongitude());
-
-        constLat = distLat/1000;
-        constLon = distLon/1000;
-        if(a.getTitle().equals("test")){
-        Toast.makeText(getApplicationContext(),constLat+" "+constLon,Toast.LENGTH_SHORT).show();}
-        long delay = 10;
-        final GeoPoint point = a.getPosition();
-         for (int i = 0; i < 1000; i++) {
-             //Thread.sleep(delay);
-             double e=point.getLatitude()+constLat;
-             double r=point.getLongitude()+constLon;
-             point.setLatitude(e);
-             point.setLongitude(r);
-             a.setPosition(new GeoPoint(e,r));
-
-
-             //a.setPosition(b.getPosition());
-            // Toast.makeText(getApplicationContext(),"index: "+ i+" \nconstlat = "+constLat+"\ndistlat = "+distLat+"\ne = "+point.getLatitude()+constLat+"\nb = "+point.getLongitude()+constLon,Toast.LENGTH_SHORT).show();
-             if(a.getPosition().equals(b.getPosition())){
-                 return;
-             }
-         }
-         a.setPosition(new GeoPoint(latf, lonf));
      }
 
     @Override
