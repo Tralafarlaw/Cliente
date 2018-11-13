@@ -73,10 +73,6 @@ public class mapaosm extends AppCompatActivity {
        /// TextView tv =(TextView) findViewById(R.id.Nombre);
        // tv.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-            AlertNoGps();
-        }
         init_mapa();
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -293,49 +289,18 @@ public class mapaosm extends AppCompatActivity {
          }
      }
 
-    private void AlertNoGps(){
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("El sistema de GPS esta desactivado, ¿Desea activarlo?")
-                .setCancelable(false)
-                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        alert = builder.create();
-        alert.show();
-    }
+
 
     @Override
     public void onDestroy(){
         super.onDestroy();
-        if(alert != null)
-        {
-            alert.dismiss();
-        }
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-
-            if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-                return ;
-            } else{
-                locationManager.removeUpdates(locationListener);
-            }
-
-        } else{
-            locationManager.removeUpdates(locationListener);
-        }
+        
 
     }
 
