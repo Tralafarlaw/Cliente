@@ -3,15 +3,20 @@ package tralafarlaw.miguel.find;
 import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.widget.TextView;
@@ -49,6 +54,7 @@ public class mapaosm extends AppCompatActivity {
     Context ctx;
     IMapController mapDriver;
     Location yo;
+    AlertDialog alert = null;
 
     //database firbase
     private DatabaseReference databaseReference;
@@ -65,6 +71,11 @@ public class mapaosm extends AppCompatActivity {
         setContentView(R.layout.activity_mapaosm);
        /// TextView tv =(TextView) findViewById(R.id.Nombre);
        // tv.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if ( !locationManager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+            AlertNoGps();
+        }
         init_mapa();
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -281,9 +292,50 @@ public class mapaosm extends AppCompatActivity {
          }
      }
 
+    private void AlertNoGps(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("El sistema de GPS esta desactivado, ¿Desea activarlo?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        alert = builder.create();
+        alert.show();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if(alert != null)
+        {
+            alert.dismiss();
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+
+            if(checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                return ;
+            } else{
+                locationManager.removeUpdates(locationListener);
+            }
+
+        } else{
+            locationManager.removeUpdates(locationListener);
+        }
+
     }
 
     @Override
