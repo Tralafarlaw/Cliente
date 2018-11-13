@@ -46,6 +46,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 public class mapaosm extends AppCompatActivity {
 
@@ -73,12 +74,17 @@ public class mapaosm extends AppCompatActivity {
        /// TextView tv =(TextView) findViewById(R.id.Nombre);
        // tv.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
 
+        try {
         init_mapa();
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
         User user1 = new User(fbuser.getEmail(),yo.getLongitude(),yo.getLatitude(),true,"pnaranja");
-
+        }catch (Exception e){
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
+            startActivity(intent);
+        }
 
 
 
@@ -108,21 +114,29 @@ public class mapaosm extends AppCompatActivity {
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,(LocationListener) mlocListener);
 
         //locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        yo = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            yo = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Toast.makeText(getApplicationContext(),""+String.valueOf(yo.getLatitude())+" \n"+String.valueOf(yo.getLongitude()), Toast.LENGTH_SHORT).show();
+
+            GeoPoint starPoint = new GeoPoint(yo.getLatitude(),yo.getLongitude());
+
+            mapDriver.setCenter(starPoint);
+            mapDriver.setZoom(15.0);
 
 
-        Toast.makeText(getApplicationContext(),""+String.valueOf(yo.getLatitude())+" \n"+String.valueOf(yo.getLongitude()), Toast.LENGTH_SHORT).show();
 
-        GeoPoint starPoint = new GeoPoint(yo.getLatitude(),yo.getLongitude());
-
-        mapDriver.setCenter(starPoint);
-        mapDriver.setZoom(15.0);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        try{
         marcadores();
+        }catch (Exception e){
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
+            startActivity(intent);
+        }
     }
 
     public void marcadores (){
@@ -153,7 +167,7 @@ public class mapaosm extends AppCompatActivity {
                 for (DataSnapshot data: dataSnapshot.getChildren()){
                     User user = data.getValue(User.class);
                     Marker mk  = new Marker(map);
-                    mk.setIcon(getResources().getDrawable(R.drawable.pppnaranja));
+                    mk.setIcon(getResources().getDrawable(R.drawable.inaranja));
                     mk.setTitle(user.getEmail());
                     mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                     mk.setPosition(new GeoPoint(user.getLat(),user.getLon()));
