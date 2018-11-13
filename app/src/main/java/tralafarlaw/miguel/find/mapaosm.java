@@ -50,6 +50,7 @@ import java.util.List;
 public class mapaosm extends AppCompatActivity {
 
     LocationManager locationManager;
+    LocationListener locationListener;
     MapView map;
     Context ctx;
     IMapController mapDriver;
