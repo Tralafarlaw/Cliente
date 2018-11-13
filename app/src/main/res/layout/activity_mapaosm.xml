@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".mapaosm">
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/switch_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:srcCompat="@drawable/ilogout"
+        tools:layout_editor_absoluteX="328dp"
+        tools:layout_editor_absoluteY="511dp" />
+
     <org.osmdroid.views.MapView
         android:id="@+id/mapaOSM"
         android:layout_width="match_parent"
@@ -14,6 +23,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" >
+
+    </org.osmdroid.views.MapView>
 
 </android.support.constraint.ConstraintLayout>

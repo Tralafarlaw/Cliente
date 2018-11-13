@@ -15,10 +15,12 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +59,7 @@ public class mapaosm extends AppCompatActivity {
     IMapController mapDriver;
     Location yo;
     AlertDialog alert = null;
+    boolean islogued = true;
 
     //database firbase
     private DatabaseReference databaseReference;
@@ -75,7 +78,7 @@ public class mapaosm extends AppCompatActivity {
        // tv.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
 
         try {
-        init_mapa();
+        init_mapa(true);
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
@@ -85,6 +88,31 @@ public class mapaosm extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
             startActivity(intent);
         }
+        final FloatingActionButton btn = (FloatingActionButton) findViewById(R.id.switch_button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(islogued){
+                    btn.setBackground(getResources().getDrawable(R.drawable.ilogin));
+
+                    islogued = false;
+                    databaseReference = FirebaseDatabase.getInstance().getReference();
+                    FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
+                   // init_mapa(false);
+                    User user1 = new User(fbuser.getDisplayName(),yo.getLongitude(), yo.getLatitude(),false,"inaranja");
+
+                    databaseReference.child(fbuser.getDisplayName()).child("visible").setValue(false);
+                } else{
+                    btn.setBackground(getResources().getDrawable(R.drawable.ilogout));
+                    islogued = true;
+                    databaseReference = FirebaseDatabase.getInstance().getReference();
+                    FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
+                    User user1 = new User(fbuser.getDisplayName(),yo.getLongitude(), yo.getLatitude(),true,"inaranja");
+                   // init_mapa(true);
+                    databaseReference.child(fbuser.getDisplayName()).child("visible").setValue(true);
+                }
+            }
+        });
 
 
 
@@ -92,7 +120,7 @@ public class mapaosm extends AppCompatActivity {
 
 
     }
-    public void init_mapa(){
+    public void init_mapa(boolean sw){
         map = (MapView) findViewById(R.id.mapaOSM);
         map.setTileSource(TileSourceFactory.MAPNIK);
 
@@ -109,7 +137,7 @@ public class mapaosm extends AppCompatActivity {
 
 
         LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        MyLocationListener mlocListener = new MyLocationListener();
+        MyLocationListener mlocListener = new MyLocationListener(sw);
         mlocListener.setMainActivity(this);
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0,(LocationListener) mlocListener);
 
@@ -121,7 +149,7 @@ public class mapaosm extends AppCompatActivity {
             GeoPoint starPoint = new GeoPoint(yo.getLatitude(),yo.getLongitude());
 
             mapDriver.setCenter(starPoint);
-            mapDriver.setZoom(15.0);
+            mapDriver.setZoom(17.5);
 
 
 
@@ -165,14 +193,14 @@ public class mapaosm extends AppCompatActivity {
 
                 };
                 for (DataSnapshot data: dataSnapshot.getChildren()){
-                    User user = data.getValue(User.class);
+                    //User user = data.getValue(User.class);
                     Marker mk  = new Marker(map);
                     mk.setIcon(getResources().getDrawable(R.drawable.inaranja));
-                    mk.setTitle(user.getEmail());
+                    mk.setTitle(data.child("email").getValue()+"");
                     mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                    mk.setPosition(new GeoPoint(user.getLat(),user.getLon()));
-                    mk.setVisible(user.isVisible());
-                    map.postInvalidate();
+                    mk.setPosition(new GeoPoint(Double.valueOf(data.child("lat").getValue()+""), Double.valueOf(""+data.child("lon").getValue())));
+                    mk.setVisible(Boolean.parseBoolean(data.child("visible").getValue()+""));
+                    map.invalidate();
 
                     boolean sw = false;
                     for (Overlay o : map.getOverlays()){
@@ -183,6 +211,7 @@ public class mapaosm extends AppCompatActivity {
                             v.add(aux.getPosition());
                             v.add(mk.getPosition());
                             line.setPoints(v);
+                            aux.setVisible(Boolean.parseBoolean(data.child("visible").getValue()+""));
                             aux.setPosition(mk.getPosition());
 
                             /*inicio de la animacion
