@@ -88,12 +88,25 @@ public class mapaosm extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
             startActivity(intent);
         }
+        final FloatingActionButton log = (FloatingActionButton) findViewById(R.id.logout_button);
+        log.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                databaseReference.child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child("visible").setValue(false);
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+
+               // Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
+                startActivity(intent);
+            }
+        });
+
         final FloatingActionButton btn = (FloatingActionButton) findViewById(R.id.switch_button);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(islogued){
-                    btn.setBackground(getResources().getDrawable(R.drawable.ilogin));
+                    btn.setBackgroundResource(R.drawable.ilogin);
 
                     islogued = false;
                     databaseReference = FirebaseDatabase.getInstance().getReference();
@@ -103,7 +116,8 @@ public class mapaosm extends AppCompatActivity {
 
                     databaseReference.child(fbuser.getDisplayName()).child("visible").setValue(false);
                 } else{
-                    btn.setBackground(getResources().getDrawable(R.drawable.ilogout));
+                    btn.setBackgroundResource(R.drawable.ilogout);
+                    //btn.setBackground(getResources().getDrawable(R.drawable.ilogout));
                     islogued = true;
                     databaseReference = FirebaseDatabase.getInstance().getReference();
                     FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();

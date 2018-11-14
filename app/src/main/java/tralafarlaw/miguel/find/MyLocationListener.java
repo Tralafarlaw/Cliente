@@ -40,9 +40,10 @@ public class MyLocationListener implements LocationListener {
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
-        User user1 = new User(fbuser.getDisplayName(),loc.getLongitude(),loc.getLatitude(), visible,"pnaranja");
-        updatedb(user1);
-
+        if(fbuser != null) {
+            User user1 = new User(fbuser.getDisplayName(), loc.getLongitude(), loc.getLatitude(), visible, "pnaranja");
+            updatedb(user1);
+        }
     }
 
     public void updatedb (User usr){
@@ -50,7 +51,7 @@ public class MyLocationListener implements LocationListener {
         databaseReference.child(usr.getEmail()).child("email").setValue(usr.getEmail());
         databaseReference.child(usr.getEmail()).child("lat").setValue(usr.getLat());
         databaseReference.child(usr.getEmail()).child("lon").setValue(usr.getLon());
-        databaseReference.child(usr.getEmail()).child("lon");
+        databaseReference.child(usr.getEmail()).child("visible");
     }
 
     @Override

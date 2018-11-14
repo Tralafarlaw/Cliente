@@ -7,13 +7,26 @@
     tools:context=".mapaosm">
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/logout_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="24dp"
+        android:clickable="true"
+        app:layout_constraintBottom_toTopOf="@+id/switch_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@android:drawable/ic_lock_power_off" />
+
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/switch_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="24dp"
         android:clickable="true"
-        app:srcCompat="@drawable/ilogout"
-        tools:layout_editor_absoluteX="328dp"
-        tools:layout_editor_absoluteY="511dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ilogout" />
 
     <org.osmdroid.views.MapView
         android:id="@+id/mapaOSM"
