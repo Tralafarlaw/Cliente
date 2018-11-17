@@ -2,6 +2,8 @@ package tralafarlaw.miguel.find;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
@@ -232,6 +234,36 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (permissionLocation == PackageManager.PERMISSION_GRANTED) {
             getMyLocation();
         }
+    }
+
+
+    //Si se presiona el boton de atras ejecutar lo siguiente
+
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        AlertDialog.Builder alerta = new AlertDialog.Builder(MainActivity.this);
+        alerta.setMessage("¿Desea Salir de la aplicacion?")
+                .setCancelable(false)
+                .setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog titulo = alerta.create();
+        titulo.setTitle("Salida");
+        titulo.show();
+
+
+
     }
 
 

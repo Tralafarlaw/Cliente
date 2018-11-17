@@ -93,6 +93,7 @@ public class mapaosm extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
         User user1 = new User(fbuser.getEmail(),yo.getLongitude(),yo.getLatitude(),true,"pnaranja");
+        databaseReference.child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child("visible").setValue(true);
         }catch (Exception e){
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
@@ -362,6 +363,20 @@ public class mapaosm extends AppCompatActivity {
          }
      }
 
+
+    public void onBackPressed() {
+        //super.onBackPressed();
+        databaseReference.child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child("visible").setValue(false);
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+
+        // Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
+        startActivity(intent);
+
+
+
+
+    }
 
 
     @Override
