@@ -167,9 +167,9 @@ public class mapaosm extends AppCompatActivity {
         mlocListener.setMainActivity(this);
         if(LocationManager.GPS_PROVIDER != null) {
 
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2 * 20 * 1000, 10, (LocationListener) mlocListener);
+            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, 10, (LocationListener) mlocListener);
         }else{
-            mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2 * 20 * 1000, 10, (LocationListener) mlocListener);
+            mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10, 10, (LocationListener) mlocListener);
         }
         //locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
