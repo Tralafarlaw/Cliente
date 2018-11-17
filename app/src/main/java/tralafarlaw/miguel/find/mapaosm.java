@@ -24,6 +24,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -60,6 +65,11 @@ public class mapaosm extends AppCompatActivity {
     Location yo;
     AlertDialog alert = null;
     boolean islogued = true;
+
+    private GoogleApiClient mGoogleApiClient;
+    private static final int PLAY_SERVICES_RES_REQUEST = 7172;
+    private static final int MY_PERMISSION_REQUEST_CODE = 7171;
+    private LocationRequest mLocationRequest;
 
     //database firbase
     private DatabaseReference databaseReference;
@@ -134,6 +144,8 @@ public class mapaosm extends AppCompatActivity {
 
 
     }
+
+
     public void init_mapa(boolean sw){
         map = (MapView) findViewById(R.id.mapaOSM);
         map.setTileSource(TileSourceFactory.MAPNIK);
