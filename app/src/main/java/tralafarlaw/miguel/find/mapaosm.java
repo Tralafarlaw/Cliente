@@ -242,6 +242,9 @@ public class mapaosm extends AppCompatActivity {
 
                 //    }
                     mk.setVisible(Boolean.parseBoolean(data.child("visible").getValue()+""));
+                    if(!Boolean.parseBoolean(data.child("visible").getValue()+"")){
+                        mk.remove(map);
+                    }
                     map.invalidate();
 
                     boolean sw = false;
