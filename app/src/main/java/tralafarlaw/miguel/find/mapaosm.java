@@ -232,32 +232,34 @@ public class mapaosm extends AppCompatActivity {
                 };
                 for (DataSnapshot data: dataSnapshot.getChildren()){
                     //User user = data.getValue(User.class);
-                    Marker mk  = new Marker(map);
-                    mk.setIcon(getResources().getDrawable(R.drawable.inaranja));
-                    mk.setTitle(data.child("email").getValue()+"");
-                    mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                 //   try {
+                    Marker mk;
+                    if(Boolean.parseBoolean(data.child("visible").getValue()+"")){
+                        mk  = new Marker(map);
+                        mk.setIcon(getResources().getDrawable(R.drawable.inaranja));
+                        mk.setTitle(data.child("email").getValue()+"");
+                        mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                        //   try {
                         mk.setPosition(new GeoPoint(Double.valueOf(data.child("lat").getValue() + ""), Double.valueOf("" + data.child("lon").getValue())));
-                  //  }catch (Exception e){
+                        //  }catch (Exception e){
 
-                //    }
-                    mk.setVisible(Boolean.parseBoolean(data.child("visible").getValue()+""));
-                    if(!Boolean.parseBoolean(data.child("visible").getValue()+"")){
-                        mk.remove(map);
+                        //    }
+                        mk.setVisible(Boolean.parseBoolean(data.child("visible").getValue()+""));
+                        map.getOverlays().add(mk);
                     }
                     map.invalidate();
 
                     boolean sw = false;
                     for (Overlay o : map.getOverlays()){
                         final Marker aux = (Marker) o ;
-                        if(aux.getTitle().equals(mk.getTitle())){
+                        if(aux.getTitle().equals(data.child("email").getValue()+"")){
                             Polyline line = new Polyline();
                             List<GeoPoint> v = new ArrayList<>();
                             v.add(aux.getPosition());
-                            v.add(mk.getPosition());
+                            v.add(new GeoPoint(Double.valueOf(data.child("lat").getValue() + ""), Double.valueOf("" + data.child("lon").getValue())));
                             line.setPoints(v);
                             aux.setVisible(Boolean.parseBoolean(data.child("visible").getValue()+""));
-                            aux.setPosition(mk.getPosition());
+                            aux.setPosition(new GeoPoint(Double.valueOf(data.child("lat").getValue() + ""), Double.valueOf("" + data.child("lon").getValue())));
+
 
                             /*inicio de la animacion
                             final double latf = mk.getPosition().getLatitude();
@@ -322,7 +324,7 @@ public class mapaosm extends AppCompatActivity {
                     }
                     if(!sw){
 
-                        map.getOverlays().add(mk);
+                        //map.getOverlays().add(mk);
                     }
                     //map.getController().animateTo((IGeoPoint) mk.getPosition(), 20.4, 5);
                   //  anotherOverlayItemArray.add(new OverlayItem(user.getEmail(),"",new GeoPoint(user.getLat(),user.getLon())));
