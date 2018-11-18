@@ -92,7 +92,13 @@ public class mapaosm extends AppCompatActivity {
         //empezamos con firebase
         databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
-        User user1 = new User(fbuser.getEmail(),yo.getLongitude(),yo.getLatitude(),true,"pnaranja");
+        User user1 = new User(fbuser.getDisplayName(),yo.getLongitude(),yo.getLatitude(),true,"pnaranja");
+
+            databaseReference.child(user1.getEmail()).child("color").setValue(user1.getColor());
+            databaseReference.child(user1.getEmail()).child("email").setValue(user1.getEmail());
+            databaseReference.child(user1.getEmail()).child("lat").setValue(user1.getLat());
+            databaseReference.child(user1.getEmail()).child("lon").setValue(user1.getLon());
+           // databaseReference.child(user1.getEmail()).child("visible");
         databaseReference.child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child("visible").setValue(true);
         }catch (Exception e){
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -172,6 +178,7 @@ public class mapaosm extends AppCompatActivity {
         }else{
             mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10, 10, (LocationListener) mlocListener);
         }
+        locationListener = mlocListener;
         //locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
             yo = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -229,7 +236,11 @@ public class mapaosm extends AppCompatActivity {
                     mk.setIcon(getResources().getDrawable(R.drawable.inaranja));
                     mk.setTitle(data.child("email").getValue()+"");
                     mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                    mk.setPosition(new GeoPoint(Double.valueOf(data.child("lat").getValue()+""), Double.valueOf(""+data.child("lon").getValue())));
+                 //   try {
+                        mk.setPosition(new GeoPoint(Double.valueOf(data.child("lat").getValue() + ""), Double.valueOf("" + data.child("lon").getValue())));
+                  //  }catch (Exception e){
+
+                //    }
                     mk.setVisible(Boolean.parseBoolean(data.child("visible").getValue()+""));
                     map.invalidate();
 
