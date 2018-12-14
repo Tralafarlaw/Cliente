@@ -22,7 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".mapaosm" />
-        <activity android:name=".List_Track"></activity>
+        <activity android:name=".List_Track" />
+        <activity android:name=".ListItem"></activity>
     </application>
 
 </manifest>

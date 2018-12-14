@@ -57,6 +57,7 @@ import java.util.zip.Inflater;
 
 public class mapaosm extends AppCompatActivity {
 
+
     LocationManager locationManager;
     LocationListener locationListener;
     MapView map;
@@ -86,38 +87,20 @@ public class mapaosm extends AppCompatActivity {
         setContentView(R.layout.activity_mapaosm);
        /// TextView tv =(TextView) findViewById(R.id.Nombre);
        // tv.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-
-        try {
-        init_mapa(true);
-        //empezamos con firebase
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        FirebaseUser fbuser = FirebaseAuth.getInstance().getCurrentUser();
-        User user1 = new User(fbuser.getDisplayName(),yo.getLongitude(),yo.getLatitude(),true,"pnaranja");
-
-            databaseReference.child(user1.getEmail()).child("color").setValue(user1.getColor());
-            databaseReference.child(user1.getEmail()).child("email").setValue(user1.getEmail());
-            databaseReference.child(user1.getEmail()).child("lat").setValue(user1.getLat());
-            databaseReference.child(user1.getEmail()).child("lon").setValue(user1.getLon());
-           // databaseReference.child(user1.getEmail()).child("visible");
-        databaseReference.child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child("visible").setValue(true);
-        }catch (Exception e){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
-            startActivity(intent);
-        }
+        databaseReference = FirebaseDatabase.getInstance().getReference("/Conductores/"+getIntent().getStringExtra("Name"));
         final FloatingActionButton log = (FloatingActionButton) findViewById(R.id.logout_button);
         log.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                databaseReference.child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child("visible").setValue(false);
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-
-               // Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
-                startActivity(intent);
+                onBackPressed();
             }
         });
-
+        map = findViewById(R.id.mapaOSM);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setMultiTouchControls(true);
+        map.setBuiltInZoomControls(true);
+        map.getController().setZoom(18.0);
+/*
         final FloatingActionButton btn = (FloatingActionButton) findViewById(R.id.switch_button);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,7 +126,7 @@ public class mapaosm extends AppCompatActivity {
                     databaseReference.child(fbuser.getDisplayName()).child("visible").setValue(true);
                 }
             }
-        });
+        });*/
         final FloatingActionButton fab3 = findViewById(R.id.list_button);
         fab3.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,185 +138,43 @@ public class mapaosm extends AppCompatActivity {
 
     }
 
-
-    public void init_mapa(boolean sw){
-        map = (MapView) findViewById(R.id.mapaOSM);
-        map.setTileSource(TileSourceFactory.MAPNIK);
-
-        map.setBuiltInZoomControls(true);
-        map.setMultiTouchControls(true);
-
-        mapDriver = map.getController();
-
-
-        ActivityCompat.requestPermissions(mapaosm.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-        if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            Toast.makeText(getApplicationContext(),"No se dieron Permisos",Toast.LENGTH_SHORT).show();
-        }
-
-
-        LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        MyLocationListener mlocListener = new MyLocationListener(sw);
-        mlocListener.setMainActivity(this);
-        if(LocationManager.GPS_PROVIDER != null) {
-
-            mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, 10, (LocationListener) mlocListener);
-        }else{
-            mlocManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10, 10, (LocationListener) mlocListener);
-        }
-        locationListener = mlocListener;
-        //locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-            yo = mlocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            Toast.makeText(getApplicationContext(),""+String.valueOf(yo.getLatitude())+" \n"+String.valueOf(yo.getLongitude()), Toast.LENGTH_SHORT).show();
-
-            GeoPoint starPoint = new GeoPoint(yo.getLatitude(),yo.getLongitude());
-
-            mapDriver.setCenter(starPoint);
-            mapDriver.setZoom(17.5);
-
-
-
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
-        try{
+
         marcadores();
-        }catch (Exception e){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
-            startActivity(intent);
-        }
+
     }
 
     public void marcadores (){
+        final Marker ini, fin, mk;
+        mk  = new Marker(map);
+        ini = new Marker(map);
+        fin = new Marker(map);
+
+        ini.setPosition(new GeoPoint(getIntent().getDoubleExtra("Lati",1.0), getIntent().getDoubleExtra("Loni", 1.0)));
+        fin.setPosition(new GeoPoint(getIntent().getDoubleExtra("Latf",-1.0), getIntent().getDoubleExtra("Lonf", -1.0)));
+
+        ini.setIcon(getResources().getDrawable(R.drawable.pppnaranja));
+        fin.setIcon(getResources().getDrawable(R.drawable.pppnaranja));
+        mk.setIcon(getResources().getDrawable(R.drawable.pppnaranja));
+
+        ini.setTitle("Inicio");
+        fin.setTitle("Fin");
+        mk.setTitle("Conductor");
+
+        ini.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        fin.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        mk.setAnchor(Marker.ANCHOR_CENTER,Marker.ANCHOR_BOTTOM);
+
+        map.getOverlays().add(ini);
+        map.getOverlays().add(fin);
+        map.getOverlays().add(mk);
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                ItemizedIconOverlay.OnItemGestureListener<OverlayItem> gestlis = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>() {
-
-                    @Override
-                    public boolean onItemLongPress(int arg0, OverlayItem arg1) {
-                        // TODO Auto-generated method stub
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onItemSingleTapUp(int index, OverlayItem item) {
-                        Toast.makeText(
-                                getApplicationContext(),
-                                item.getSnippet() + "\n" + item.getTitle() + "\n"
-                                        + item.getPoint().getLatitude() + " : "
-                                        + item.getPoint().getLongitude(),
-                                Toast.LENGTH_LONG).show();
-                        return true;
-                    }
-
-                };
-                for (DataSnapshot data: dataSnapshot.getChildren()){
-                    //User user = data.getValue(User.class);
-                    Marker mk;
-                    if(Boolean.parseBoolean(data.child("visible").getValue()+"")){
-                        mk  = new Marker(map);
-                        mk.setIcon(getResources().getDrawable(R.drawable.inaranja));
-                        mk.setTitle(data.child("email").getValue()+"");
-                        mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-                        //   try {
-                        mk.setPosition(new GeoPoint(Double.valueOf(data.child("lat").getValue() + ""), Double.valueOf("" + data.child("lon").getValue())));
-                        //  }catch (Exception e){
-
-                        //    }
-                        mk.setVisible(Boolean.parseBoolean(data.child("visible").getValue()+""));
-                        map.getOverlays().add(mk);
-                    }
-                    map.invalidate();
-
-                    boolean sw = false;
-                    for (Overlay o : map.getOverlays()){
-                        final Marker aux = (Marker) o ;
-                        if(aux.getTitle().equals(data.child("email").getValue()+"")){
-                            Polyline line = new Polyline();
-                            List<GeoPoint> v = new ArrayList<>();
-                            v.add(aux.getPosition());
-                            v.add(new GeoPoint(Double.valueOf(data.child("lat").getValue() + ""), Double.valueOf("" + data.child("lon").getValue())));
-                            line.setPoints(v);
-                            aux.setVisible(Boolean.parseBoolean(data.child("visible").getValue()+""));
-                            aux.setPosition(new GeoPoint(Double.valueOf(data.child("lat").getValue() + ""), Double.valueOf("" + data.child("lon").getValue())));
-
-
-                            /*inicio de la animacion
-                            final double latf = mk.getPosition().getLatitude();
-                            final double lonf = mk.getPosition().getLongitude();
-                            final double lats = aux.getPosition().getLatitude();
-                            final double lons = aux.getPosition().getLongitude();
-                            final boolean up, left;
-                            if(lats > latf){
-                                up = false;
-                            }else{
-                                up=false;
-                            }
-                            if(lons > lonf){
-                                left = true;
-                            }else{
-                                left = false;
-                            }
-                            final double distLat , distLon , constLat, constLon ;
-
-                            distLat = Math.abs(lats-latf);
-                            distLon = Math.abs(lons-lonf);
-
-                            constLat = distLat/100;
-                            constLon = distLon/100;
-                            if(aux.getTitle().equals("test")){
-                                Toast.makeText(getApplicationContext(),constLat+" "+constLon,Toast.LENGTH_SHORT).show();}
-                            long delay = 1000;
-                            final GeoPoint point = aux.getPosition();
-                            for (int i = 0; i < 100; i++) {
-                                //Thread.sleep(delay);
-                                final Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Do something after 5s = 5000ms
-                                        double e = point.getLatitude(),r = point.getLongitude();
-                                        if(!up){
-                                            e -= constLat;
-                                        }else {
-                                            e += constLat;
-                                        }
-                                        if(left){
-                                            r -= constLon;
-                                        }else {
-                                            r += constLon;
-                                        }
-                                        point.setLatitude(e);
-                                        point.setLongitude(r);
-                                        aux.setPosition(point);
-                                    }
-                                }, delay);
-                                //a.setPosition(b.getPosition());
-                                // Toast.makeText(getApplicationContext(),"index: "+ i+" \nconstlat = "+constLat+"\ndistlat = "+distLat+"\ne = "+point.getLatitude()+constLat+"\nb = "+point.getLongitude()+constLon,Toast.LENGTH_SHORT).show();
-
-                            }
-                           // aux.setPosition(new GeoPoint(latf, lonf));
-                            //final de la animacion
-*/
-
-                            sw = true;
-                        }
-                    }
-                    if(!sw){
-
-                        //map.getOverlays().add(mk);
-                    }
-                    //map.getController().animateTo((IGeoPoint) mk.getPosition(), 20.4, 5);
-                  //  anotherOverlayItemArray.add(new OverlayItem(user.getEmail(),"",new GeoPoint(user.getLat(),user.getLon())));
-                }
-        //        ItemizedIconOverlay<OverlayItem> overlay = new ItemizedIconOverlay<>(getApplicationContext(),anotherOverlayItemArray, gestlis);
-      //          map.getOverlays().add(overlay);
+                ini.setPosition(new GeoPoint(getIntent().getDoubleExtra("Lat",0.0), getIntent().getDoubleExtra("Lon", 0.0)));
             }
 
             @Override
@@ -342,68 +183,8 @@ public class mapaosm extends AppCompatActivity {
             }
         });
     }
-     public void animar (final Marker a, Marker b) throws InterruptedException {
-         final double latf = b.getPosition().getLatitude();
-         final double lonf = b.getPosition().getLongitude();
-
-         final double distLat, distLon, constLat, constLon;
-
-         distLat = (a.getPosition().getLatitude() - b.getPosition().getLatitude());
-         distLon = (a.getPosition().getLongitude() - b.getPosition().getLongitude());
-
-         constLat = distLat * Math.pow(10, -3);
-         constLon = distLon * Math.pow(10, -3);
-         if (a.getTitle().equals("test")) {
-             //Toast.makeText(getApplicationContext(),constLat+" "+constLon,Toast.LENGTH_SHORT).show();}
-             long delay = 10;
-             final GeoPoint point = a.getPosition();
-             for (int i = 0; i < 1000; i++) {
-                 //Thread.sleep(delay);
-                 final Handler handler = new Handler();
-                 handler.postDelayed(new Runnable() {
-                     @Override
-                     public void run() {
-                         // Do something after 5s = 5000ms
-                         double e = point.getLatitude() + constLat;
-                         double r = point.getLongitude() + constLon;
-                         //      point.setLatitude(e);
-                         //       point.setLongitude(r);
-                         a.setPosition(new GeoPoint(e, r));
-                     }
-                 }, delay);
-                 //a.setPosition(b.getPosition());
-                 // Toast.makeText(getApplicationContext(),"index: "+ i+" \nconstlat = "+constLat+"\ndistlat = "+distLat+"\ne = "+point.getLatitude()+constLat+"\nb = "+point.getLongitude()+constLon,Toast.LENGTH_SHORT).show();
-                 if (a.getPosition().equals(b.getPosition())) {
-                     return;
-                 }
-             }
-             a.setPosition(new GeoPoint(latf, lonf));
-             return;
-         }
-     }
-
-
     public void onBackPressed() {
         onDestroy();
         super.onBackPressed();
-    }
-
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 }

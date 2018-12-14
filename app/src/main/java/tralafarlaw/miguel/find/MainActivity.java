@@ -54,6 +54,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public static final int RC_SIGN_IN = 9001;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            Intent intent = new Intent(getApplicationContext(),List_Track.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -272,8 +282,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
 
+/*
 
-    /*
     @Override
     protected void onStart() {
         super.onStart();
@@ -281,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             loginUser();
         }
     }
-    */
+
     /*
     public void inicio_de_sesion(){
         mAuth = FirebaseAuth.getInstance();
