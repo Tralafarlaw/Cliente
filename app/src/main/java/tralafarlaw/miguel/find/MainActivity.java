@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     private void startNewActivity(int resultCode, Intent data) {
         if(resultCode == RESULT_OK)
         {
-            Intent intent = new Intent(getApplicationContext(),mapaosm.class);
+            Intent intent = new Intent(getApplicationContext(),List_Track.class);
             startActivity(intent);
             finish();
         }

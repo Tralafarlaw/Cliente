@@ -144,11 +144,14 @@ public class mapaosm extends AppCompatActivity {
                 }
             }
         });
-
-
-
-
-
+        final FloatingActionButton fab3 = findViewById(R.id.list_button);
+        fab3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onDestroy();
+                onBackPressed();
+            }
+        });
 
     }
 
@@ -381,17 +384,8 @@ public class mapaosm extends AppCompatActivity {
 
 
     public void onBackPressed() {
-        //super.onBackPressed();
-        databaseReference.child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child("visible").setValue(false);
-        FirebaseAuth.getInstance().signOut();
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-
-        // Toast.makeText(getApplicationContext(),"Error de GPS porfavor active la funcin gps e intente de nuevo", Toast.LENGTH_LONG).show();
-        startActivity(intent);
-
-
-
-
+        onDestroy();
+        super.onBackPressed();
     }
 
 
